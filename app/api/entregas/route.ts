@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { readFile, writeFile } from "fs/promises"
 import path from "path"
 
-// ✅ TIPAGEM
+// ================= TIPAGEM =================
 interface Entrega {
   id: number
   descricao: string
@@ -26,14 +26,24 @@ interface DB {
 
 const dbPath = path.join(process.cwd(), "db.json")
 
+// ================= FUNÇÕES SEGURAS =================
+async function getDB(): Promise<DB> {
+  try {
+    const data = await readFile(dbPath, "utf-8")
+    return JSON.parse(data)
+  } catch {
+    return { visitantes: [], entregas: [] }
+  }
+}
+
+async function saveDB(data: DB) {
+  await writeFile(dbPath, JSON.stringify(data, null, 2))
+}
+
 // ================= GET =================
 export async function GET() {
-  try {
-    const data: DB = JSON.parse(await readFile(dbPath, "utf-8"))
-    return NextResponse.json(data.entregas)
-  } catch {
-    return NextResponse.json([])
-  }
+  const data = await getDB()
+  return NextResponse.json(data.entregas)
 }
 
 // ================= POST =================
@@ -49,20 +59,20 @@ export async function POST(req: Request) {
 
     let fotoPath: string | undefined
 
-    // 📸 Upload da foto
+    // ================= UPLOAD FOTO =================
     if (foto && foto.size > 0) {
       const bytes = await foto.arrayBuffer()
       const buffer = Buffer.from(bytes)
 
-      const fileName = Date.now() + "-" + foto.name
-      const filePath = path.join(process.cwd(), "public/uploads", fileName)
+      const fileName = `${Date.now()}-${foto.name}`
+      const uploadPath = path.join(process.cwd(), "public/uploads", fileName)
 
-      await writeFile(filePath, buffer)
+      await writeFile(uploadPath, buffer)
 
-      fotoPath = "/uploads/" + fileName
+      fotoPath = `/uploads/${fileName}`
     }
 
-    const data: DB = JSON.parse(await readFile(dbPath, "utf-8"))
+    const data = await getDB()
 
     const novaEntrega: Entrega = {
       id: Date.now(),
@@ -71,18 +81,20 @@ export async function POST(req: Request) {
       bloco,
       apartamento,
       foto: fotoPath,
-      data: new Date().toISOString()
+      data: new Date().toISOString(),
     }
 
     data.entregas.push(novaEntrega)
 
-    await writeFile(dbPath, JSON.stringify(data, null, 2))
+    await saveDB(data)
 
     return NextResponse.json(novaEntrega)
-
   } catch (error) {
     console.error(error)
-    return NextResponse.json({ error: "Erro ao salvar entrega" }, { status: 500 })
+    return NextResponse.json(
+      { error: "Erro ao salvar entrega" },
+      { status: 500 }
+    )
   }
 }
 
@@ -90,17 +102,19 @@ export async function POST(req: Request) {
 export async function DELETE(req: Request) {
   try {
     const { id } = await req.json()
-
-    const data: DB = JSON.parse(await readFile(dbPath, "utf-8"))
+    const data = await getDB()
 
     data.entregas = data.entregas.filter((e) => e.id !== id)
 
-    await writeFile(dbPath, JSON.stringify(data, null, 2))
+    await saveDB(data)
 
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error(error)
-    return NextResponse.json({ error: "Erro ao excluir" }, { status: 500 })
+    return NextResponse.json(
+      { error: "Erro ao excluir entrega" },
+      { status: 500 }
+    )
   }
 }
 
@@ -108,26 +122,33 @@ export async function DELETE(req: Request) {
 export async function PUT(req: Request) {
   try {
     const body = await req.json()
-
-    const data: DB = JSON.parse(await readFile(dbPath, "utf-8"))
+    const data = await getDB()
 
     const index = data.entregas.findIndex((e) => e.id === body.id)
 
-    if (index !== -1) {
-      data.entregas[index] = {
-        ...data.entregas[index],
-        descricao: body.descricao ?? data.entregas[index].descricao,
-        quantidade: body.quantidade ?? data.entregas[index].quantidade,
-        bloco: body.bloco ?? data.entregas[index].bloco,
-        apartamento: body.apartamento ?? data.entregas[index].apartamento
-      }
-
-      await writeFile(dbPath, JSON.stringify(data, null, 2))
+    if (index === -1) {
+      return NextResponse.json(
+        { error: "Entrega não encontrada" },
+        { status: 404 }
+      )
     }
+
+    data.entregas[index] = {
+      ...data.entregas[index],
+      descricao: body.descricao ?? data.entregas[index].descricao,
+      quantidade: body.quantidade ?? data.entregas[index].quantidade,
+      bloco: body.bloco ?? data.entregas[index].bloco,
+      apartamento: body.apartamento ?? data.entregas[index].apartamento,
+    }
+
+    await saveDB(data)
 
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error(error)
-    return NextResponse.json({ error: "Erro ao editar" }, { status: 500 })
+    return NextResponse.json(
+      { error: "Erro ao editar entrega" },
+      { status: 500 }
+    )
   }
 }
