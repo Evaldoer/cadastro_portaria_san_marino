@@ -1,125 +1,170 @@
-/* Reset básico */
+/* RESET */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+/* BODY */
 body {
   font-family: "Segoe UI", Arial, sans-serif;
-  background: #f4f6f9;
-  color: #333;
+  background: #eef2f7;
+  color: #2c3e50;
+}
+
+/* HEADER (BANNER TOP FIXO) */
+.header {
+  width: 100%;
+  background: linear-gradient(135deg, #2c3e50, #1a252f);
+  color: white;
+  padding: 18px;
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* CONTAINER */
+.container {
   padding: 20px;
 }
 
-/* Container principal */
-.container {
+/* GRID */
+.grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 }
 
-/* Cartões */
+/* CARD */
 .card {
-  background: #fff;
+  background: #ffffff;
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  border-radius: 14px;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  transition: 0.25s;
 }
 
-/* Títulos */
-h1 {
-  grid-column: span 2;
-  text-align: center;
-  margin-bottom: 30px;
+.card:hover {
+  transform: translateY(-4px);
+}
+
+/* TITLES */
+h2 {
+  margin-bottom: 15px;
+  font-size: 18px;
   color: #2c3e50;
 }
 
-h2 {
-  margin-bottom: 15px;
-  color: #34495e;
-}
-
-/* Formulários */
+/* FORM */
 form {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin-bottom: 15px;
 }
 
+/* LABEL */
+label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #555;
+}
+
+/* INPUTS */
 input {
   padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  transition: border-color 0.2s;
+  border-radius: 8px;
+  border: 1px solid #dcdcdc;
+  transition: 0.2s;
 }
 
 input:focus {
   border-color: #3498db;
   outline: none;
+  box-shadow: 0 0 4px rgba(52, 152, 219, 0.3);
 }
 
+/* BOTÃO PADRÃO */
 button {
+  margin-top: 10px;
   padding: 10px;
-  background: #3498db;
-  color: white;
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #3498db, #2980b9);
+  color: white;
   font-weight: bold;
-  transition: background 0.2s;
+  cursor: pointer;
+  transition: 0.2s;
 }
 
 button:hover {
-  background: #2980b9;
+  transform: scale(1.02);
+  opacity: 0.95;
 }
 
-/* Listas */
+/* LISTA */
 ul {
+  margin-top: 10px;
   list-style: none;
-  padding: 0;
 }
 
+/* ITEM */
 li {
-  padding: 8px;
-  border-bottom: 1px solid #eee;
-}
-
-label {
-  font-weight: bold;
-  margin-top: 10px;
-}
-
-input {
-  padding: 8px;
-  margin-bottom: 10px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-button {
-  margin-top: 10px;
-  padding: 10px;
-  background: #3498db;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #2980b9;
-}
-
-.header {
-  width: 100%;
-  background: #2c3e50;
-  color: white;
-  text-align: center;
-  padding: 20px;
-  font-size: 28px;
-  font-weight: bold;
+  background: #f8f9fb;
+  padding: 12px;
   border-radius: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
+  border-left: 5px solid #3498db;
+  transition: 0.2s;
+}
+
+li:hover {
+  background: #f1f4f8;
+}
+
+/* FOTO */
+img {
+  border-radius: 10px;
+  margin-top: 8px;
+}
+
+/* AÇÕES (BOTÕES EDITAR/EXCLUIR) */
+.actions {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+/* BOTÃO EDITAR */
+.btn-edit {
+  background: linear-gradient(135deg, #f39c12, #d68910);
+}
+
+/* BOTÃO EXCLUIR */
+.btn-delete {
+  background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+/* HOVER BOTÕES */
+.btn-edit:hover {
+  transform: scale(1.05);
+}
+
+.btn-delete:hover {
+  transform: scale(1.05);
+}
+
+/* RESPONSIVO */
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header {
+    font-size: 20px;
+    padding: 15px;
+  }
 }

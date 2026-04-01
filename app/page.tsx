@@ -24,7 +24,6 @@ export default function Home() {
   const [visitantes, setVisitantes] = useState<Visitante[]>([]);
   const [entregas, setEntregas] = useState<Entrega[]>([]);
 
-  // ✅ DATA BRASÍLIA
   function formatarData(data?: string) {
     if (!data) return "";
 
@@ -60,7 +59,29 @@ export default function Home() {
     });
 
     form.reset();
-    await carregarVisitantes();
+    carregarVisitantes();
+  }
+
+  async function excluirVisitante(id: number) {
+    await fetch("/api/visitantes", {
+      method: "DELETE",
+      body: JSON.stringify({ id }),
+    });
+
+    carregarVisitantes();
+  }
+
+  async function editarVisitante(v: Visitante) {
+    const nome = prompt("Novo nome:", v.nome);
+    if (!nome) return;
+
+    await fetch("/api/visitantes", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...v, nome }),
+    });
+
+    carregarVisitantes();
   }
 
   // ================= ENTREGAS =================
@@ -94,10 +115,31 @@ export default function Home() {
     });
 
     form.reset();
-    await carregarEntregas();
+    carregarEntregas();
   }
 
-  // INIT
+  async function excluirEntrega(id: number) {
+    await fetch("/api/entregas", {
+      method: "DELETE",
+      body: JSON.stringify({ id }),
+    });
+
+    carregarEntregas();
+  }
+
+  async function editarEntrega(e: Entrega) {
+    const descricao = prompt("Nova descrição:", e.descricao);
+    if (!descricao) return;
+
+    await fetch("/api/entregas", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...e, descricao }),
+    });
+
+    carregarEntregas();
+  }
+
   useEffect(() => {
     async function init() {
       await carregarVisitantes();
@@ -108,49 +150,35 @@ export default function Home() {
 
   return (
     <>
-      {/* ✅ HEADER CORRETO */}
       <header className="header">
         🏢 Portaria San Marino
       </header>
 
       <div className="container">
 
-        {/* VISITANTE */}
+        {/* FORM VISITANTE */}
         <div className="card">
           <h2>👤 Registrar Visitante</h2>
 
           <form onSubmit={registrarVisitante}>
-            <label>Nome</label>
-            <input name="nome" placeholder="Digite o nome" required />
-
-            <label>RG</label>
-            <input name="rg" placeholder="Digite o RG" required />
-
-            <label>Apartamento</label>
-            <input name="apartamento" placeholder="Ex: 1105" required />
+            <input name="nome" placeholder="Nome" required />
+            <input name="rg" placeholder="RG" required />
+            <input name="apartamento" placeholder="Apartamento" required />
 
             <button type="submit">Registrar</button>
           </form>
         </div>
 
-        {/* ENTREGA */}
+        {/* FORM ENTREGA */}
         <div className="card">
           <h2>📦 Registrar Entrega</h2>
 
           <form onSubmit={registrarEntrega}>
-            <label>Descrição</label>
-            <input name="descricao" placeholder="Ex: Pizza, Encomenda" required />
+            <input name="descricao" placeholder="Descrição" required />
+            <input name="quantidade" placeholder="Quantidade" required />
+            <input name="bloco" placeholder="Bloco" required />
+            <input name="apartamento" placeholder="Apartamento" required />
 
-            <label>Quantidade</label>
-            <input name="quantidade" placeholder="Ex: 1" required />
-
-            <label>Bloco</label>
-            <input name="bloco" placeholder="Ex: A, B, C" required />
-
-            <label>Apartamento</label>
-            <input name="apartamento" placeholder="Ex: 1508" required />
-
-            <label>📸 Foto da encomenda</label>
             <input name="foto" type="file" />
 
             <button type="submit">Registrar</button>
@@ -162,19 +190,25 @@ export default function Home() {
           <h2>📋 Visitantes</h2>
 
           <ul>
-            {visitantes.length === 0 ? (
-              <li>Carregando visitantes...</li>
-            ) : (
-              visitantes.map((v) => (
-                <li key={v.id}>
-                  👤 {v.nome} - RG: {v.rg}
-                  <br />
-                  🏠 Ap {v.apartamento}
-                  <br />
-                  🕒 {formatarData(v.data)}
-                </li>
-              ))
-            )}
+            {visitantes.map((v) => (
+              <li key={v.id}>
+                👤 {v.nome} - RG: {v.rg}
+                <br />
+                🏠 Ap {v.apartamento}
+                <br />
+                🕒 {formatarData(v.data)}
+
+                <div className="actions">
+                  <button className="btn-edit" onClick={() => editarVisitante(v)}>
+                    ✏️
+                  </button>
+
+                  <button className="btn-delete" onClick={() => excluirVisitante(v.id)}>
+                    ❌
+                  </button>
+                </div>
+              </li>
+            ))}
           </ul>
         </div>
 
@@ -183,29 +217,29 @@ export default function Home() {
           <h2>📦 Entregas</h2>
 
           <ul>
-            {entregas.length === 0 ? (
-              <li>Carregando entregas...</li>
-            ) : (
-              entregas.map((e) => (
-                <li key={e.id}>
-                  📦 {e.descricao} - {e.quantidade} un
-                  <br />
-                  🏢 Bloco {e.bloco} Ap {e.apartamento}
-                  <br />
-                  🕒 {formatarData(e.data)}
+            {entregas.map((e) => (
+              <li key={e.id}>
+                📦 {e.descricao} - {e.quantidade}
+                <br />
+                🏢 Bloco {e.bloco} Ap {e.apartamento}
+                <br />
+                🕒 {formatarData(e.data)}
 
-                  {e.foto && (
-                    <Image
-                      src={e.foto}
-                      width={100}
-                      height={100}
-                      alt="Foto"
-                      style={{ marginTop: 8, borderRadius: 6 }}
-                    />
-                  )}
-                </li>
-              ))
-            )}
+                {e.foto && (
+                  <Image src={e.foto} width={100} height={100} alt="foto" />
+                )}
+
+                <div className="actions">
+                  <button className="btn-edit" onClick={() => editarEntrega(e)}>
+                    ✏️
+                  </button>
+
+                  <button className="btn-delete" onClick={() => excluirEntrega(e.id)}>
+                    ❌
+                  </button>
+                </div>
+              </li>
+            ))}
           </ul>
         </div>
 
