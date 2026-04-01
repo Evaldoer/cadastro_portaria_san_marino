@@ -1,173 +1,348 @@
+/* ===== WINDOWS 2000 / CLASSIC MICROSOFT STYLE ===== */
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
-/* ================= BODY ================= */
+/* ===== COLOR TOKENS ===== */
+:root {
+  --win-bg:          #d4d0c8;
+  --win-surface:     #ece9d8;
+  --win-titlebar:    #0a246a;
+  --win-titlebar-2:  #a6caf0;
+  --win-text:        #000000;
+  --win-text-light:  #ffffff;
+  --win-border-light:#ffffff;
+  --win-border-mid:  #aca899;
+  --win-border-dark: #808080;
+  --win-border-xdark:#000000;
+  --win-blue:        #0831b5;
+  --win-btn-face:    #d4d0c8;
+  --win-highlight:   #316ac5;
+  --win-scrollbar:   #d4d0c8;
+}
+
+/* ===== BODY ===== */
 body {
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: linear-gradient(180deg, #eef2f7, #e6ebf3);
-  color: #2c3e50;
+  font-family: "Tahoma", "MS Sans Serif", Arial, sans-serif;
+  font-size: 11px;
+  background: var(--win-bg);
+  color: var(--win-text);
   min-height: 100vh;
 }
 
-/* ================= HEADER ================= */
+/* ===== 3D RAISED BORDER (button / window edge) ===== */
+.raised {
+  border-top:    2px solid var(--win-border-light);
+  border-left:   2px solid var(--win-border-light);
+  border-right:  2px solid var(--win-border-xdark);
+  border-bottom: 2px solid var(--win-border-xdark);
+}
+
+/* ===== 3D SUNKEN BORDER (input / inset panel) ===== */
+.sunken {
+  border-top:    2px solid var(--win-border-dark);
+  border-left:   2px solid var(--win-border-dark);
+  border-right:  2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+}
+
+/* ===== TASKBAR / HEADER ===== */
 .header {
   width: 100%;
-  background: linear-gradient(135deg, #1f2d3a, #111a22);
-  color: white;
-  padding: 20px;
-  font-size: 22px;
-  font-weight: 700;
-  text-align: center;
+  height: 28px;
+  background: linear-gradient(180deg, #1b55cc 0%, #0a246a 100%);
+  color: var(--win-text-light);
+  font-size: 12px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  gap: 6px;
   position: sticky;
   top: 0;
   z-index: 1000;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
-  letter-spacing: 0.5px;
+  border-bottom: 1px solid #000;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+  letter-spacing: 0.3px;
 }
 
-/* ================= CONTAINER ================= */
+.header-icon {
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border: 1px solid #999;
+  border-radius: 2px;
+  display: inline-block;
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* ===== CONTAINER ===== */
 .container {
-  padding: 25px;
-}
-
-/* ================= GRID ================= */
-.grid {
+  padding: 12px;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: 22px;
-}
-
-/* ================= CARD ================= */
-.card {
-  background: #ffffff;
-  padding: 22px;
-  border-radius: 16px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
-  transition: all 0.25s ease;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-}
-
-.card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.12);
-}
-
-/* ================= TITLES ================= */
-h2 {
-  margin-bottom: 15px;
-  font-size: 18px;
-  color: #1f2d3a;
-}
-
-/* ================= FORM ================= */
-form {
-  display: flex;
-  flex-direction: column;
   gap: 12px;
 }
 
-/* ================= INPUT ================= */
-input {
-  padding: 11px 12px;
-  border-radius: 10px;
-  border: 1px solid #d6dbe6;
-  font-size: 14px;
-  transition: all 0.2s ease;
-  background: #f9fafc;
+/* ===== WINDOW / CARD ===== */
+.card {
+  background: var(--win-surface);
+  border-top:    2px solid var(--win-border-light);
+  border-left:   2px solid var(--win-border-light);
+  border-right:  2px solid var(--win-border-xdark);
+  border-bottom: 2px solid var(--win-border-xdark);
+  padding: 0;
+}
+
+/* Window title bar */
+.card > h2 {
+  background: linear-gradient(180deg, #0a2589 0%, #3a6fd8 45%, #0a246a 100%);
+  color: var(--win-text-light);
+  font-size: 11px;
+  font-weight: bold;
+  padding: 3px 6px;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+  border-bottom: 1px solid #0a246a;
+  user-select: none;
+  letter-spacing: 0.2px;
+}
+
+/* Window close / min / max buttons in title bar */
+.card > h2::after {
+  content: "✕";
+  margin-left: auto;
+  background: var(--win-btn-face);
+  color: #000;
+  font-size: 9px;
+  width: 16px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-top:    1px solid #fff;
+  border-left:   1px solid #fff;
+  border-right:  1px solid #000;
+  border-bottom: 1px solid #000;
+  text-shadow: none;
+  cursor: default;
+}
+
+/* Window content area */
+.card > form,
+.card > ul {
+  padding: 10px 10px 12px;
+}
+
+/* ===== FORM ===== */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* ===== INPUT ===== */
+input[type="text"],
+input[type="file"],
+input:not([type="submit"]):not([type="button"]):not([type="reset"]):not([type="file"]) {
+  padding: 3px 5px;
+  font-family: "Tahoma", Arial, sans-serif;
+  font-size: 11px;
+  background: #ffffff;
+  color: #000;
+  border-top:    2px solid var(--win-border-dark);
+  border-left:   2px solid var(--win-border-dark);
+  border-right:  2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+  outline: none;
+  width: 100%;
+}
+
+input[type="file"] {
+  background: var(--win-btn-face);
+  padding: 2px 4px;
 }
 
 input:focus {
-  border-color: #3498db;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
-  background: #fff;
+  border-top:    2px solid var(--win-border-xdark);
+  border-left:   2px solid var(--win-border-xdark);
+  border-right:  2px solid var(--win-border-mid);
+  border-bottom: 2px solid var(--win-border-mid);
 }
 
-/* ================= BUTTON ================= */
+/* ===== BUTTON ===== */
 button {
-  margin-top: 8px;
-  padding: 11px;
-  border: none;
-  border-radius: 10px;
-  background: linear-gradient(135deg, #3498db, #1f78c1);
-  color: white;
-  font-weight: 600;
+  margin-top: 4px;
+  padding: 4px 12px;
+  font-family: "Tahoma", Arial, sans-serif;
+  font-size: 11px;
+  background: var(--win-btn-face);
+  color: #000;
+  border-top:    2px solid var(--win-border-light);
+  border-left:   2px solid var(--win-border-light);
+  border-right:  2px solid var(--win-border-xdark);
+  border-bottom: 2px solid var(--win-border-xdark);
   cursor: pointer;
-  transition: all 0.2s ease;
+  min-width: 75px;
+  text-align: center;
+  font-weight: normal;
+  transition: none;
 }
 
 button:hover {
-  transform: scale(1.03);
-  opacity: 0.95;
+  background: var(--win-btn-face);
+  outline: 1px dotted #000;
+  outline-offset: -4px;
+  transform: none;
+  opacity: 1;
 }
 
-/* ================= LIST ================= */
+button:active {
+  border-top:    2px solid var(--win-border-xdark);
+  border-left:   2px solid var(--win-border-xdark);
+  border-right:  2px solid var(--win-border-light);
+  border-bottom: 2px solid var(--win-border-light);
+  padding: 5px 11px 3px 13px;
+}
+
+/* Submit button — blue default button */
+button[type="submit"] {
+  background: var(--win-btn-face);
+  border: 2px solid #000;
+  box-shadow: inset 1px 1px 0 #fff, inset -1px -1px 0 #808080;
+  font-weight: bold;
+}
+
+/* ===== PANEL DIVIDER ===== */
+.panel-divider {
+  height: 2px;
+  background: var(--win-border-dark);
+  border-bottom: 1px solid var(--win-border-light);
+  margin: 8px 0;
+}
+
+/* ===== LIST ===== */
 ul {
-  margin-top: 12px;
   list-style: none;
+  margin: 0;
+  padding: 8px 10px 10px;
 }
 
-/* ================= ITEM ================= */
+/* ===== LIST ITEM ===== */
 li {
-  background: #f8fafc;
-  padding: 14px;
-  border-radius: 12px;
-  margin-bottom: 12px;
-  border-left: 5px solid #3498db;
-  transition: all 0.2s ease;
+  background: #ffffff;
+  font-size: 11px;
+  line-height: 1.6;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  border-top:    1px solid var(--win-border-dark);
+  border-left:   1px solid var(--win-border-dark);
+  border-right:  1px solid var(--win-border-light);
+  border-bottom: 1px solid var(--win-border-light);
 }
 
 li:hover {
-  background: #eef4fb;
-  transform: translateX(2px);
+  background: var(--win-highlight);
+  color: #fff;
+  transform: none;
 }
 
-/* ================= IMAGEM ================= */
+li:hover .actions button {
+  background: var(--win-btn-face);
+  color: #000;
+}
+
+/* ===== IMAGE ===== */
 img {
-  border-radius: 12px;
-  margin-top: 10px;
+  margin-top: 6px;
   max-width: 100%;
   height: auto;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+  border: 2px solid var(--win-border-dark);
+  border-radius: 0;
+  box-shadow: none;
 }
 
-/* ================= ACTIONS ================= */
+/* ===== ACTIONS ===== */
 .actions {
-  margin-top: 12px;
+  margin-top: 6px;
   display: flex;
-  gap: 10px;
+  gap: 4px;
 }
 
-/* ================= BOTÕES ESPECÍFICOS ================= */
-.btn-edit {
-  background: linear-gradient(135deg, #f39c12, #d68910);
+.actions button {
+  margin-top: 0;
+  min-width: 0;
+  padding: 2px 8px;
+  font-size: 11px;
 }
 
-.btn-delete {
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
+/* ===== STATUS BAR ===== */
+.statusbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 22px;
+  background: var(--win-bg);
+  border-top: 2px solid var(--win-border-light);
+  display: flex;
+  align-items: center;
+  padding: 0 8px;
+  font-size: 11px;
+  gap: 8px;
+  z-index: 999;
 }
 
-.btn-edit:hover,
-.btn-delete:hover {
-  transform: scale(1.06);
-  opacity: 0.95;
+.statusbar-panel {
+  border-top:    1px solid var(--win-border-dark);
+  border-left:   1px solid var(--win-border-dark);
+  border-right:  1px solid var(--win-border-light);
+  border-bottom: 1px solid var(--win-border-light);
+  padding: 1px 6px;
+  font-size: 10px;
 }
 
-/* ================= RESPONSIVO ================= */
+/* ===== SCROLLBAR (Webkit classic look) ===== */
+::-webkit-scrollbar { width: 16px; height: 16px; }
+::-webkit-scrollbar-track { background: var(--win-scrollbar); }
+::-webkit-scrollbar-thumb {
+  background: var(--win-btn-face);
+  border-top:    2px solid var(--win-border-light);
+  border-left:   2px solid var(--win-border-light);
+  border-right:  2px solid var(--win-border-xdark);
+  border-bottom: 2px solid var(--win-border-xdark);
+}
+::-webkit-scrollbar-button {
+  background: var(--win-btn-face);
+  border-top:    2px solid var(--win-border-light);
+  border-left:   2px solid var(--win-border-light);
+  border-right:  2px solid var(--win-border-xdark);
+  border-bottom: 2px solid var(--win-border-xdark);
+  height: 16px;
+  width: 16px;
+}
+
+/* ===== RESPONSIVE ===== */
 @media (max-width: 768px) {
   .container {
-    padding: 15px;
+    padding: 6px;
+    gap: 8px;
+    grid-template-columns: 1fr;
   }
-
   .header {
-    font-size: 18px;
-    padding: 14px;
+    font-size: 11px;
   }
+}
 
-  .card {
-    padding: 18px;
-  }
+/* ===== bottom padding so statusbar doesn't overlap ===== */
+body {
+  padding-bottom: 24px;
 }
