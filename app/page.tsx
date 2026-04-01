@@ -63,7 +63,7 @@ export default function Home() {
     })
 
     form.reset()
-    carregarVisitantes()
+    await carregarVisitantes()
   }
 
   async function excluirVisitante(id: number) {
@@ -73,7 +73,7 @@ export default function Home() {
       body: JSON.stringify({ id }),
     })
 
-    carregarVisitantes()
+    await carregarVisitantes()
   }
 
   async function editarVisitante(v: Visitante) {
@@ -86,7 +86,7 @@ export default function Home() {
       body: JSON.stringify({ ...v, nome }),
     })
 
-    carregarVisitantes()
+    await carregarVisitantes()
   }
 
   // ================= ENTREGAS =================
@@ -120,7 +120,7 @@ export default function Home() {
     })
 
     form.reset()
-    carregarEntregas()
+    await carregarEntregas()
   }
 
   async function excluirEntrega(id: number) {
@@ -130,7 +130,7 @@ export default function Home() {
       body: JSON.stringify({ id }),
     })
 
-    carregarEntregas()
+    await carregarEntregas()
   }
 
   async function editarEntrega(e: Entrega) {
@@ -143,13 +143,19 @@ export default function Home() {
       body: JSON.stringify({ ...e, descricao }),
     })
 
-    carregarEntregas()
+    await carregarEntregas()
   }
 
-  // ================= INIT =================
+  // ================= INIT (CORRIGIDO ESLINT) =================
   useEffect(() => {
-    carregarVisitantes()
-    carregarEntregas()
+    const init = async () => {
+      await Promise.all([
+        carregarVisitantes(),
+        carregarEntregas()
+      ])
+    }
+
+    init()
   }, [])
 
   // ================= UI =================
@@ -181,7 +187,6 @@ export default function Home() {
             <input name="bloco" placeholder="Bloco" required />
             <input name="apartamento" placeholder="Apartamento" required />
             <input name="foto" type="file" />
-
             <button type="submit">Registrar</button>
           </form>
         </div>

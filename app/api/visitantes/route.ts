@@ -24,7 +24,7 @@ interface DB {
 
 const filePath = path.join(process.cwd(), "db.json")
 
-// ================= FUNÇÃO SEGURA DB =================
+// ================= DB =================
 async function getDB(): Promise<DB> {
   try {
     const data = await readFile(filePath, "utf-8")
@@ -50,6 +50,13 @@ export async function POST(req: Request) {
     const body = await req.json()
     const data = await getDB()
 
+    if (!body?.nome || !body?.rg || !body?.apartamento) {
+      return NextResponse.json(
+        { error: "Campos obrigatórios faltando" },
+        { status: 400 }
+      )
+    }
+
     const novo: Visitante = {
       id: Date.now(),
       nome: body.nome,
@@ -59,12 +66,11 @@ export async function POST(req: Request) {
     }
 
     data.visitantes.push(novo)
-
     await saveDB(data)
 
     return NextResponse.json(novo)
   } catch (error) {
-    console.error(error)
+    console.error("POST ERROR:", error)
     return NextResponse.json(
       { error: "Erro ao salvar visitante" },
       { status: 500 }
@@ -72,19 +78,44 @@ export async function POST(req: Request) {
   }
 }
 
-// ================= DELETE =================
+// ================= DELETE (CORRIGIDO) =================
 export async function DELETE(req: Request) {
   try {
-    const { id } = await req.json()
+    const body = await req.json().catch(() => null)
+
+    if (!body?.id) {
+      return NextResponse.json(
+        { error: "ID inválido" },
+        { status: 400 }
+      )
+    }
+
+    const id = Number(body.id)
+
+    if (isNaN(id)) {
+      return NextResponse.json(
+        { error: "ID não é válido" },
+        { status: 400 }
+      )
+    }
+
     const data = await getDB()
 
+    const before = data.visitantes.length
     data.visitantes = data.visitantes.filter((v) => v.id !== id)
+
+    if (data.visitantes.length === before) {
+      return NextResponse.json(
+        { error: "Visitante não encontrado" },
+        { status: 404 }
+      )
+    }
 
     await saveDB(data)
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error(error)
+    console.error("DELETE ERROR:", error)
     return NextResponse.json(
       { error: "Erro ao excluir visitante" },
       { status: 500 }
@@ -118,7 +149,7 @@ export async function PUT(req: Request) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error(error)
+    console.error("PUT ERROR:", error)
     return NextResponse.json(
       { error: "Erro ao editar visitante" },
       { status: 500 }

@@ -13,20 +13,14 @@ interface Entrega {
   data: string
 }
 
-interface Visitante {
-  id: number
-  nome: string
-  data: string
-}
-
 interface DB {
-  visitantes: Visitante[]
   entregas: Entrega[]
+  visitantes: any[]
 }
 
 const dbPath = path.join(process.cwd(), "db.json")
 
-// ================= FUNÇÕES SEGURAS =================
+// ================= DB =================
 async function getDB(): Promise<DB> {
   try {
     const data = await readFile(dbPath, "utf-8")
@@ -51,15 +45,14 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData()
 
-    const descricao = formData.get("descricao") as string
-    const quantidade = formData.get("quantidade") as string
-    const bloco = formData.get("bloco") as string
-    const apartamento = formData.get("apartamento") as string
+    const descricao = String(formData.get("descricao") || "")
+    const quantidade = String(formData.get("quantidade") || "")
+    const bloco = String(formData.get("bloco") || "")
+    const apartamento = String(formData.get("apartamento") || "")
     const foto = formData.get("foto") as File | null
 
     let fotoPath: string | undefined
 
-    // ================= UPLOAD FOTO =================
     if (foto && foto.size > 0) {
       const bytes = await foto.arrayBuffer()
       const buffer = Buffer.from(bytes)
@@ -85,12 +78,11 @@ export async function POST(req: Request) {
     }
 
     data.entregas.push(novaEntrega)
-
     await saveDB(data)
 
     return NextResponse.json(novaEntrega)
   } catch (error) {
-    console.error(error)
+    console.error("POST ERROR:", error)
     return NextResponse.json(
       { error: "Erro ao salvar entrega" },
       { status: 500 }
@@ -98,19 +90,44 @@ export async function POST(req: Request) {
   }
 }
 
-// ================= DELETE =================
+// ================= DELETE (CORRIGIDO) =================
 export async function DELETE(req: Request) {
   try {
-    const { id } = await req.json()
+    const body = await req.json().catch(() => null)
+
+    if (!body?.id) {
+      return NextResponse.json(
+        { error: "ID inválido" },
+        { status: 400 }
+      )
+    }
+
+    const id = Number(body.id)
+
+    if (isNaN(id)) {
+      return NextResponse.json(
+        { error: "ID não é número válido" },
+        { status: 400 }
+      )
+    }
+
     const data = await getDB()
 
+    const before = data.entregas.length
     data.entregas = data.entregas.filter((e) => e.id !== id)
+
+    if (data.entregas.length === before) {
+      return NextResponse.json(
+        { error: "Entrega não encontrada" },
+        { status: 404 }
+      )
+    }
 
     await saveDB(data)
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error(error)
+    console.error("DELETE ERROR:", error)
     return NextResponse.json(
       { error: "Erro ao excluir entrega" },
       { status: 500 }
@@ -122,6 +139,7 @@ export async function DELETE(req: Request) {
 export async function PUT(req: Request) {
   try {
     const body = await req.json()
+
     const data = await getDB()
 
     const index = data.entregas.findIndex((e) => e.id === body.id)
@@ -145,7 +163,7 @@ export async function PUT(req: Request) {
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error(error)
+    console.error("PUT ERROR:", error)
     return NextResponse.json(
       { error: "Erro ao editar entrega" },
       { status: 500 }

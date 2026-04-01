@@ -1,22 +1,4 @@
 {
-  "visitantes": [
-    {
-      "id": 1775068640435,
-      "nome": "teste",
-      "rg": "2563589",
-      "apartamento": "1205",
-      "data": "2026-04-01T18:37:20.435Z"
-    }
-  ],
-  "entregas": [
-    {
-      "id": 1775068734695,
-      "descricao": "Televisão",
-      "quantidade": "2",
-      "bloco": "D",
-      "apartamento": "1802",
-      "foto": "/uploads/1775068734692-image1-7.jpg",
-      "data": "2026-04-01T18:38:54.695Z"
-    }
-  ]
+  "visitantes": [],
+  "entregas": []
 }
