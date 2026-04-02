@@ -1,35 +1,35 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import Image from "next/image"
+import { useEffect, useState } from "react";
+import Image from "next/image";
 
 // ================= TIPOS =================
 type Visitante = {
-  id: number
-  nome: string
-  rg: string
-  apartamento: string
-  data?: string
-}
+  id: number;
+  nome: string;
+  rg: string;
+  apartamento: string;
+  data?: string;
+};
 
 type Entrega = {
-  id: number
-  descricao: string
-  quantidade: string
-  bloco: string
-  apartamento: string
-  foto?: string
-  data?: string
-}
+  id: number;
+  descricao: string;
+  quantidade: string;
+  bloco: string;
+  apartamento: string;
+  foto?: string;
+  data?: string;
+};
 
 // ================= COMPONENTE =================
 export default function Home() {
-  const [visitantes, setVisitantes] = useState<Visitante[]>([])
-  const [entregas, setEntregas] = useState<Entrega[]>([])
+  const [visitantes, setVisitantes] = useState<Visitante[]>([]);
+  const [entregas, setEntregas] = useState<Entrega[]>([]);
 
   // ================= FORMATAR DATA =================
   function formatarData(data?: string) {
-    if (!data) return ""
+    if (!data) return "";
 
     return new Date(data).toLocaleString("pt-BR", {
       timeZone: "America/Sao_Paulo",
@@ -38,32 +38,34 @@ export default function Home() {
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    })
+    });
   }
 
   // ================= VISITANTES =================
   async function carregarVisitantes() {
-    const res = await fetch("/api/visitantes", { cache: "no-store" })
-    const data = await res.json()
-    setVisitantes(data)
+    const res = await fetch("/api/visitantes", { cache: "no-store" });
+    const data = await res.json();
+    setVisitantes(Array.isArray(data) ? data : []);
   }
 
   async function registrarVisitante(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const form = e.currentTarget
+    e.preventDefault();
+    const form = e.currentTarget;
 
-    const nome = (form.elements.namedItem("nome") as HTMLInputElement).value
-    const rg = (form.elements.namedItem("rg") as HTMLInputElement).value
-    const apartamento = (form.elements.namedItem("apartamento") as HTMLInputElement).value
+    const nome = (form.elements.namedItem("nome") as HTMLInputElement).value;
+    const rg = (form.elements.namedItem("rg") as HTMLInputElement).value;
+    const apartamento = (
+      form.elements.namedItem("apartamento") as HTMLInputElement
+    ).value;
 
     await fetch("/api/visitantes", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ nome, rg, apartamento }),
-    })
+    });
 
-    form.reset()
-    await carregarVisitantes()
+    form.reset();
+    await carregarVisitantes();
   }
 
   async function excluirVisitante(id: number) {
@@ -71,56 +73,61 @@ export default function Home() {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
-    })
+    });
 
-    await carregarVisitantes()
+    await carregarVisitantes();
   }
 
   async function editarVisitante(v: Visitante) {
-    const nome = prompt("Novo nome:", v.nome)
-    if (!nome) return
+    const nome = prompt("Novo nome:", v.nome);
+    if (!nome) return;
 
     await fetch("/api/visitantes", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...v, nome }),
-    })
+    });
 
-    await carregarVisitantes()
+    await carregarVisitantes();
   }
 
   // ================= ENTREGAS =================
   async function carregarEntregas() {
-    const res = await fetch("/api/entregas", { cache: "no-store" })
-    const data = await res.json()
-    setEntregas(data)
+    const res = await fetch("/api/entregas", { cache: "no-store" });
+    const data = await res.json();
+    setEntregas(Array.isArray(data) ? data : []);
   }
-
   async function registrarEntrega(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const form = e.currentTarget
+    e.preventDefault();
+    const form = e.currentTarget;
 
-    const descricao = (form.elements.namedItem("descricao") as HTMLInputElement).value
-    const quantidade = (form.elements.namedItem("quantidade") as HTMLInputElement).value
-    const bloco = (form.elements.namedItem("bloco") as HTMLInputElement).value
-    const apartamento = (form.elements.namedItem("apartamento") as HTMLInputElement).value
-    const foto = (form.elements.namedItem("foto") as HTMLInputElement).files?.[0]
+    const descricao = (form.elements.namedItem("descricao") as HTMLInputElement)
+      .value;
+    const quantidade = (
+      form.elements.namedItem("quantidade") as HTMLInputElement
+    ).value;
+    const bloco = (form.elements.namedItem("bloco") as HTMLInputElement).value;
+    const apartamento = (
+      form.elements.namedItem("apartamento") as HTMLInputElement
+    ).value;
+    const foto = (form.elements.namedItem("foto") as HTMLInputElement)
+      .files?.[0];
 
-    const formData = new FormData()
-    formData.append("descricao", descricao)
-    formData.append("quantidade", quantidade)
-    formData.append("bloco", bloco)
-    formData.append("apartamento", apartamento)
+    const formData = new FormData();
+    formData.append("descricao", descricao);
+    formData.append("quantidade", quantidade);
+    formData.append("bloco", bloco);
+    formData.append("apartamento", apartamento);
 
-    if (foto) formData.append("foto", foto)
+    if (foto) formData.append("foto", foto);
 
     await fetch("/api/entregas", {
       method: "POST",
       body: formData,
-    })
+    });
 
-    form.reset()
-    await carregarEntregas()
+    form.reset();
+    await carregarEntregas();
   }
 
   async function excluirEntrega(id: number) {
@@ -128,35 +135,32 @@ export default function Home() {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id }),
-    })
+    });
 
-    await carregarEntregas()
+    await carregarEntregas();
   }
 
   async function editarEntrega(e: Entrega) {
-    const descricao = prompt("Nova descrição:", e.descricao)
-    if (!descricao) return
+    const descricao = prompt("Nova descrição:", e.descricao);
+    if (!descricao) return;
 
     await fetch("/api/entregas", {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ...e, descricao }),
-    })
+    });
 
-    await carregarEntregas()
+    await carregarEntregas();
   }
 
   // ================= INIT (CORRIGIDO ESLINT) =================
   useEffect(() => {
     const init = async () => {
-      await Promise.all([
-        carregarVisitantes(),
-        carregarEntregas()
-      ])
-    }
+      await Promise.all([carregarVisitantes(), carregarEntregas()]);
+    };
 
-    init()
-  }, [])
+    init();
+  }, []);
 
   // ================= UI =================
   return (
@@ -164,7 +168,6 @@ export default function Home() {
       <header className="header">🏢 Portaria San Marino</header>
 
       <div className="container">
-
         {/* VISITANTE */}
         <div className="card">
           <h2>👤 Registrar Visitante</h2>
@@ -203,7 +206,6 @@ export default function Home() {
                 🏠 Ap {v.apartamento}
                 <br />
                 🕒 {formatarData(v.data)}
-
                 <div className="actions">
                   <button onClick={() => editarVisitante(v)}>✏️</button>
                   <button onClick={() => excluirVisitante(v.id)}>❌</button>
@@ -225,16 +227,9 @@ export default function Home() {
                 🏢 Bloco {e.bloco} Ap {e.apartamento}
                 <br />
                 🕒 {formatarData(e.data)}
-
                 {e.foto && (
-                  <Image
-                    src={e.foto}
-                    width={100}
-                    height={100}
-                    alt="foto"
-                  />
+                  <Image src={e.foto} width={100} height={100} alt="foto" />
                 )}
-
                 <div className="actions">
                   <button onClick={() => editarEntrega(e)}>✏️</button>
                   <button onClick={() => excluirEntrega(e.id)}>❌</button>
@@ -243,8 +238,7 @@ export default function Home() {
             ))}
           </ul>
         </div>
-
       </div>
     </>
-  )
+  );
 }
