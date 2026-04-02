@@ -14,8 +14,8 @@ interface Entrega {
 }
 
 interface DB {
-  entregas: Entrega[]
   visitantes: any[]
+  entregas: Entrega[]
 }
 
 const dbPath = path.join(process.cwd(), "db.json")
@@ -45,14 +45,20 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData()
 
-    const descricao = String(formData.get("descricao") || "")
-    const quantidade = String(formData.get("quantidade") || "")
-    const bloco = String(formData.get("bloco") || "")
-    const apartamento = String(formData.get("apartamento") || "")
+    const descricao = String(formData.get("descricao") || "").trim()
+    const quantidade = String(formData.get("quantidade") || "").trim()
+    const bloco = String(formData.get("bloco") || "").trim()
+    const apartamento = String(formData.get("apartamento") || "").trim()
     const foto = formData.get("foto") as File | null
 
-    let fotoPath: string | undefined
+    if (!descricao || !quantidade || !bloco || !apartamento) {
+      return NextResponse.json(
+        { error: "Campos obrigatórios faltando" },
+        { status: 400 }
+      )
+    }
 
+    let fotoPath: string | undefined
     if (foto && foto.size > 0) {
       const bytes = await foto.arrayBuffer()
       const buffer = Buffer.from(bytes)
@@ -61,7 +67,6 @@ export async function POST(req: Request) {
       const uploadPath = path.join(process.cwd(), "public/uploads", fileName)
 
       await writeFile(uploadPath, buffer)
-
       fotoPath = `/uploads/${fileName}`
     }
 
@@ -83,55 +88,37 @@ export async function POST(req: Request) {
     return NextResponse.json(novaEntrega)
   } catch (error) {
     console.error("POST ERROR:", error)
-    return NextResponse.json(
-      { error: "Erro ao salvar entrega" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Erro ao salvar entrega" }, { status: 500 })
   }
 }
 
-// ================= DELETE (CORRIGIDO) =================
+// ================= DELETE =================
 export async function DELETE(req: Request) {
   try {
     const body = await req.json().catch(() => null)
 
     if (!body?.id) {
-      return NextResponse.json(
-        { error: "ID inválido" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "ID inválido" }, { status: 400 })
     }
 
     const id = Number(body.id)
-
     if (isNaN(id)) {
-      return NextResponse.json(
-        { error: "ID não é número válido" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "ID não é número válido" }, { status: 400 })
     }
 
     const data = await getDB()
-
     const before = data.entregas.length
     data.entregas = data.entregas.filter((e) => e.id !== id)
 
     if (data.entregas.length === before) {
-      return NextResponse.json(
-        { error: "Entrega não encontrada" },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "Entrega não encontrada" }, { status: 404 })
     }
 
     await saveDB(data)
-
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error("DELETE ERROR:", error)
-    return NextResponse.json(
-      { error: "Erro ao excluir entrega" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Erro ao excluir entrega" }, { status: 500 })
   }
 }
 
@@ -139,16 +126,11 @@ export async function DELETE(req: Request) {
 export async function PUT(req: Request) {
   try {
     const body = await req.json()
-
     const data = await getDB()
 
     const index = data.entregas.findIndex((e) => e.id === body.id)
-
     if (index === -1) {
-      return NextResponse.json(
-        { error: "Entrega não encontrada" },
-        { status: 404 }
-      )
+      return NextResponse.json({ error: "Entrega não encontrada" }, { status: 404 })
     }
 
     data.entregas[index] = {
@@ -160,13 +142,9 @@ export async function PUT(req: Request) {
     }
 
     await saveDB(data)
-
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error("PUT ERROR:", error)
-    return NextResponse.json(
-      { error: "Erro ao editar entrega" },
-      { status: 500 }
-    )
+    return NextResponse.json({ error: "Erro ao editar entrega" }, { status: 500 })
   }
 }
